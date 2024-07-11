@@ -30,12 +30,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Typography } from '@mui/material';
 import { Label } from "@/components/ui/label"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addProduct } from '@/api/cms.api';
 import { RequestBody } from '@/typescript/common.interface';
 import { toast } from 'sonner';
-import { useRouter } from 'next/router';
 import { LoadingButton } from '@mui/lab';
 
 const formSchema = z.object({
@@ -72,7 +71,6 @@ const style = {
 function Add({ open, handleClose }: { open: boolean, handleClose: any }) {
 
     const [img, setImg] = useState<File | null>(null)
-    const router = useRouter()
     const queryClient = useQueryClient()
 
     // 1. Define your form.
@@ -97,6 +95,8 @@ function Add({ open, handleClose }: { open: boolean, handleClose: any }) {
         },
         onSuccess: (res) => {
             if (res && Array.isArray(res) && res.length > 0) {
+                form.reset()
+                setImg(null)
                 console.log(res);
                 toast("Product added successfully", {
                     action: {
@@ -136,7 +136,13 @@ function Add({ open, handleClose }: { open: boolean, handleClose: any }) {
 
 
     console.log(addProductRes);
-    
+
+    // useEffect(() => {
+    //     if(form.formState.isSubmitSuccessful){
+    //         form.reset()
+    //     }
+    // }, [form.formState, form.formState.isSubmitted, form.reset])
+
 
     return (
         <>
@@ -218,6 +224,17 @@ function Add({ open, handleClose }: { open: boolean, handleClose: any }) {
                                     )}
                                 />
 
+                                {/* <FormField
+                                    name='img'
+                                    render={({ field })} => (
+                                <div className="grid w-full max-w-sm items-center gap-1.5">
+                                    <Label htmlFor="picture">Picture</Label>
+                                    <Input id="picture" type="file" onChange={handleFileChange} />
+                                    {img && <img src={URL.createObjectURL(img)} height={100} width={100} />}
+                                </div>
+                                )
+                                /> */}
+
                                 <div className="grid w-full max-w-sm items-center gap-1.5">
                                     <Label htmlFor="picture">Picture</Label>
                                     <Input id="picture" type="file" onChange={handleFileChange} />
@@ -225,7 +242,7 @@ function Add({ open, handleClose }: { open: boolean, handleClose: any }) {
                                 </div>
 
                                 <Button>
-                                    {isPending ? <LoadingButton loading color='primary'/> : `Add Product`}
+                                    {isPending ? <LoadingButton loading color='primary' /> : `Add Product`}
                                 </Button>
                             </form>
                         </Form>
